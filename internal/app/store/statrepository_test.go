@@ -9,7 +9,7 @@ import (
 )
 
 func TestStatRepository_Add(t *testing.T) {
-	s, teardown := store.TestStore(t)
+	s, teardown := store.TestStore(t, databaseURL)
 	defer teardown("statistics")
 
 	stat, err := s.Stat().Add(&model.StatisticsShow{
@@ -25,7 +25,7 @@ func TestStatRepository_Add(t *testing.T) {
 }
 
 func TestStatRepository_Show(t *testing.T) {
-	s, teardown := store.TestStore(t)
+	s, teardown := store.TestStore(t, databaseURL)
 	defer teardown("statistics")
 
 	s.Stat().Add(&model.StatisticsShow{
