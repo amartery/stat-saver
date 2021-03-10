@@ -19,4 +19,4 @@ func NewConfig() *Config {
 }
 
 // psql -h localhost statserver_db statserver
-// insert into Statistic (event_date, views, clicks, cost, cpc, cpm) values ('2021-03-09', 25, 27, 1.67, 0,06185185, 66.8)
+// insert into Statistic (event_date, views, clicks, cost, cpc, cpm) values ('2021-03-09', 25, 27, 1.67, 0.06185185, 66.8)

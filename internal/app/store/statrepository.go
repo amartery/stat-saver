@@ -27,11 +27,17 @@ func (r *StatRepository) Add(s *model.StatisticsShow) (*model.StatisticsShow, er
 // Show ...
 func (r *StatRepository) Show(d *model.DateLimit) ([]model.StatisticsShow, error) {
 	var result = []model.StatisticsShow{}
-	rows, err := r.store.db.Query("select stat_id, event_date, views, clicks, cost, cpc, cpm "+
-		"from Statistic where event_date >= $1 and event_date <= $2 order by event_date;", d.From, d.To)
+
+	queryReq := fmt.Sprintf("select * from Statistic "+
+		"where event_date >= '%s' and event_date <= '%s' order by %s;",
+		d.From,
+		d.To,
+		"event_date")
+	rows, err := r.store.db.Query(queryReq)
 	if err != nil {
 		return nil, err
 	}
+
 	for rows.Next() {
 		currentStat := model.StatisticsShow{}
 		if err := rows.Scan(
@@ -54,10 +60,13 @@ func (r *StatRepository) Show(d *model.DateLimit) ([]model.StatisticsShow, error
 // ShowOrdered ...
 func (r *StatRepository) ShowOrdered(d *model.DateLimit, category string) ([]model.StatisticsShow, error) {
 	var result = []model.StatisticsShow{}
-	fmt.Println(">>>", category)
+	queryReq := fmt.Sprintf("select * from Statistic "+
+		"where event_date >= '%s' and event_date <= '%s' order by %s;",
+		d.From,
+		d.To,
+		category)
 
-	rows, err := r.store.db.Query("select stat_id, event_date, views, clicks, cost, cpc, cpm "+
-		"from Statistic where event_date >= $1 and event_date <= $2 order by $3 asc;", d.From, d.To, category)
+	rows, err := r.store.db.Query(queryReq)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +84,16 @@ func (r *StatRepository) ShowOrdered(d *model.DateLimit, category string) ([]mod
 			return nil, err
 		}
 		currentStat.Date = currentStat.Date[:10]
-		fmt.Println(currentStat)
 		result = append(result, currentStat)
 	}
-	//fmt.Println(result)
 	return result, nil
+}
+
+// ClearingStatistics ...
+func (r *StatRepository) ClearingStatistics() error {
+	_, err := r.store.db.Exec("truncate Statistic restart identity;")
+	if err != nil {
+		return err
+	}
+	return nil
 }

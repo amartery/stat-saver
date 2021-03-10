@@ -1,16 +1,16 @@
 package store
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // ...
 )
 
 // Store ...
 type Store struct {
 	config         *Config
-	db             *sql.DB
+	db             *sqlx.DB
 	statRepository *StatRepository
 }
 
@@ -23,7 +23,7 @@ func New(config *Config) *Store {
 
 // Open ...
 func (s *Store) Open() error {
-	db, err := sql.Open("postgres", s.config.DataBaseURL) // "host=localhost dbname=profiles_db user=server password=password sslmode=disable"
+	db, err := sqlx.Connect("postgres", s.config.DataBaseURL) // "host=localhost dbname=profiles_db user=server password=password sslmode=disable"
 	if err != nil {
 		fmt.Println("open db")
 		return err
