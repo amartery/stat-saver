@@ -2,8 +2,8 @@ package validation
 
 import (
 	"fmt"
-	"math"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/amartery/statSaver/internal/app/model"
@@ -79,7 +79,7 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 		res.Clicks = clicksInt
 	}
 	if r.Cost != "" {
-		if len(r.Cost) != 4 {
+		if !validCostFormat(r.Cost) {
 			return nil, fmt.Errorf("cost must have two decimal places")
 		}
 		costFloat, err := strconv.ParseFloat(r.Cost, 64)
@@ -101,9 +101,13 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 	return res, nil
 }
 
-func checkDecimalPlaces(i int, value float64) bool {
-	valueFloat := value * float64(math.Pow(10.0, float64(i)))
-	extra := valueFloat - float64(int(valueFloat))
-	fmt.Println(extra)
-	return extra == 0
+func validCostFormat(value string) bool {
+	s := strings.Split(value, ".")
+	if len(s) != 2 {
+		return false
+	}
+	if len(s[1]) != 2 {
+		return false
+	}
+	return true
 }
