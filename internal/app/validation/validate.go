@@ -61,7 +61,7 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 	if r.Views != "" {
 		viewsInt, err := strconv.ParseInt(r.Views, 10, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("is not a valid views")
 		}
 		if viewsInt < 0 {
 			return nil, fmt.Errorf("views must be > 0")
@@ -71,7 +71,7 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 	if r.Clicks != "" {
 		clicksInt, err := strconv.ParseInt(r.Clicks, 10, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("is not a valid clicks")
 		}
 		if clicksInt < 0 {
 			return nil, fmt.Errorf("clicks must be > 0")
@@ -84,7 +84,7 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 		}
 		costFloat, err := strconv.ParseFloat(r.Cost, 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("is not a valid cost")
 		}
 		if costFloat < 0 {
 			return nil, fmt.Errorf("cost must be > 0")
@@ -92,10 +92,10 @@ func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
 		res.Cost = costFloat
 	}
 
-	if r.Cost != "" && r.Clicks != "" {
+	if r.Cost != "" && r.Clicks != "" && res.Clicks != 0 {
 		res.Cpc = res.Cost / float64(res.Clicks)
 	}
-	if r.Cost != "" && r.Views != "" {
+	if r.Cost != "" && r.Views != "" && res.Views != 0 {
 		res.Cpm = res.Cost / float64(res.Views) * 1000
 	}
 	return res, nil
