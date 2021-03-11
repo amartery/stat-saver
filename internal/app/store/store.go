@@ -23,7 +23,7 @@ func New(config *Config) *Store {
 
 // Open ...
 func (s *Store) Open() error {
-	db, err := sqlx.Connect("postgres", s.config.DataBaseURL) // "host=localhost dbname=profiles_db user=server password=password sslmode=disable"
+	db, err := sqlx.Connect("postgres", s.config.DataBaseURL)
 	if err != nil {
 		fmt.Println("open db")
 		return err

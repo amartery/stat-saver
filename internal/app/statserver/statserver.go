@@ -77,7 +77,6 @@ func (s *StatServer) handleShow() http.HandlerFunc {
 		from := r.URL.Query().Get("from")
 		to := r.URL.Query().Get("to")
 
-		// валидация даты
 		fromto, err := validation.DateValidate(from, to)
 		if err != nil {
 			fmt.Println(err)
@@ -89,7 +88,7 @@ func (s *StatServer) handleShow() http.HandlerFunc {
 		fieldSort := r.URL.Query().Get("sort")
 
 		if fieldSort != "" {
-			if !validation.FieldSortValid(fieldSort) { // валидация метода сортировки
+			if !validation.FieldSortValid(fieldSort) {
 				msg := fieldSort + "field doesn`t exist, available fields [event_date, views, clicks, cost, cpc, cpm]"
 				s.error(w, r, http.StatusBadRequest, fmt.Errorf(msg))
 				return
