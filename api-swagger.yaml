@@ -1,0 +1,123 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/amartery/avi/1.0.0
+info:
+  version: "1.0.0"
+  title: Statistic saver
+  
+
+paths:
+  /stat/show:
+    get:
+      summary: shows statistics
+      parameters:
+        - in: query
+          name: from
+          description: start date of the period
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2016-08-29'
+        - in: query
+          name: to
+          description: period end date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2018-08-29'
+        - in: query
+          name: sort
+          description: period end date
+          required: false
+          schema:
+            type: string
+            example: 'cost'
+    
+      responses:
+        '200':
+          description: statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatisticsItemShow'
+        '400':
+          description: bad input parameter
+  /stat/add:
+    post:
+      summary: add statistics
+      responses:
+        '200':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatisticsItemSave'
+        
+  /stat/del:  
+    delete:
+      summary: delete statistics
+      responses:
+        '200':
+          description: item created
+        '500':
+          description: 'statistics not found'
+        
+components:
+  schemas:
+    StatisticsItemSave:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+          format: date
+          example: '2016-08-29'
+        views:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        cost:
+          type: number
+          format: doubler
+          
+    StatisticsItemShow:
+      type: object
+      required:
+        - date
+        - views
+        - clicks
+        - cost
+        - cpc
+        - cpm
+      properties:
+        date:
+          type: string
+          format: date
+          example: '2016-08-29'
+        views:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        cost:
+          type: number
+          format: double
+        cpc:
+          type: number
+          format: double
+        cpm:
+          type: number
+          format: double

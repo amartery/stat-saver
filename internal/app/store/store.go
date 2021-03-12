@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // ...
@@ -21,6 +22,19 @@ func New(config *Config) *Store {
 	}
 }
 
+// InitDatabase ...
+func (s *Store) InitDatabase() error {
+	sqlInitFile, err := ioutil.ReadFile("scripts/statistics.sql")
+	if err != nil {
+		return err
+	}
+	_, err = s.db.Exec(string(sqlInitFile))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Open ...
 func (s *Store) Open() error {
 	db, err := sqlx.Connect("postgres", s.config.DataBaseURL)
@@ -28,12 +42,15 @@ func (s *Store) Open() error {
 		fmt.Println("open db")
 		return err
 	}
-
 	if err := db.Ping(); err != nil {
 		fmt.Println("ping db")
 		return err
 	}
 	s.db = db
+	if err := s.InitDatabase(); err != nil {
+		fmt.Println("init db")
+		return err
+	}
 	return nil
 }
 

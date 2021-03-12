@@ -1,0 +1,28 @@
+version: '3.8'
+
+volumes:
+  db:
+
+services:
+  database:
+    image:
+       postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data/
+    environment:
+        POSTGRES_DB: statserver_db
+        POSTGRES_USER: statserver
+        POSTGRES_PASSWORD: password
+
+  main:
+    build: .
+    command:
+        ./main
+    ports:
+      - "8080:8080"
+    links:
+        - database
+    depends_on:
+        - database
