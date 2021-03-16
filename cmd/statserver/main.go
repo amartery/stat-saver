@@ -4,7 +4,10 @@ import (
 	"log"
 
 	"github.com/BurntSushi/toml"
-	"github.com/amartery/statSaver/internal/app/statserver"
+	"github.com/amartery/statSaver/internal/app/delivery/http"
+	"github.com/amartery/statSaver/internal/app/repository/postgresDB"
+	"github.com/amartery/statSaver/internal/app/usecase"
+	"github.com/amartery/statSaver/internal/pkg/utility"
 )
 
 var (
@@ -12,14 +15,22 @@ var (
 )
 
 func main() {
-	config := statserver.NewConfig()
+	config := http.NewConfig()
 
 	_, err := toml.DecodeFile(configPath, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	s := statserver.New(config)
+	postgresCon, err := utility.CreatePostgresConnection(config.DataBaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	statRep := postgresDB.NewStatRepository(postgresCon)
+	statUsecase := usecase.NewStatUsecase(statRep)
+
+	s := http.New(config, statUsecase)
 	if err := s.Start(); err != nil {
 		log.Fatal(err)
 	}

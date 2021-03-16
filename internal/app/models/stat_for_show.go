@@ -1,4 +1,4 @@
-package model
+package models
 
 // StatisticsShow ...
 type StatisticsShow struct {

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/amartery/statSaver/internal/app/model"
+	"github.com/amartery/statSaver/internal/app/models"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestDateValidate(t *testing.T) {
 	type outputDateValidate struct {
-		limit *model.DateLimit
+		limit *models.DateLimit
 		err   error
 	}
 	testCases := []struct {
@@ -23,7 +23,7 @@ func TestDateValidate(t *testing.T) {
 			name: "normal",
 			from: "2000-01-01",
 			to:   "2020-01-01",
-			want: outputDateValidate{&model.DateLimit{From: "2000-01-01", To: "2020-01-01"}, nil},
+			want: outputDateValidate{&models.DateLimit{From: "2000-01-01", To: "2020-01-01"}, nil},
 		},
 		{
 			name: "to year in the future",
@@ -126,18 +126,18 @@ func TestFieldSortValid(t *testing.T) {
 
 func TestRequestValidate(t *testing.T) {
 	type outputRequestValidate struct {
-		fromReq *model.StatisticsShow
+		fromReq *models.StatisticsShow
 		err     error
 	}
 	testCases := []struct {
 		name    string
-		request *model.Request
+		request *models.Request
 		want    outputRequestValidate
 	}{
 		{
 			name:    "normal full",
-			request: &model.Request{Date: "2000-01-01", Views: "22", Clicks: "41", Cost: "9.22"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01", Views: "22", Clicks: "41", Cost: "9.22"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date:   "2000-01-01",
 				Views:  22,
 				Clicks: 41,
@@ -148,8 +148,8 @@ func TestRequestValidate(t *testing.T) {
 		},
 		{
 			name:    "normal date, views, cost",
-			request: &model.Request{Date: "2000-01-01", Views: "22", Cost: "9.22"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01", Views: "22", Cost: "9.22"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date:  "2000-01-01",
 				Views: 22,
 				Cost:  9.22,
@@ -158,28 +158,28 @@ func TestRequestValidate(t *testing.T) {
 		},
 		{
 			name:    "normal date, cost",
-			request: &model.Request{Date: "2000-01-01", Cost: "9.22"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01", Cost: "9.22"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date: "2000-01-01",
 				Cost: 9.22,
 			}, nil},
 		},
 		{
 			name:    "only date",
-			request: &model.Request{Date: "2000-01-01"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date: "2000-01-01",
 			}, nil},
 		},
 		{
 			name:    "invalid without date",
-			request: &model.Request{Views: "22", Clicks: "41", Cost: "9.22"},
+			request: &models.Request{Views: "22", Clicks: "41", Cost: "9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("is not a valid date")},
 		},
 		{
 			name:    "normal date, clicks, cost",
-			request: &model.Request{Date: "2000-01-01", Clicks: "41", Cost: "9.22"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01", Clicks: "41", Cost: "9.22"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date:   "2000-01-01",
 				Clicks: 41,
 				Cost:   9.22,
@@ -188,8 +188,8 @@ func TestRequestValidate(t *testing.T) {
 		},
 		{
 			name:    "normal date, views, clicks but not cost",
-			request: &model.Request{Date: "2000-01-01", Views: "22", Clicks: "41"},
-			want: outputRequestValidate{&model.StatisticsShow{
+			request: &models.Request{Date: "2000-01-01", Views: "22", Clicks: "41"},
+			want: outputRequestValidate{&models.StatisticsShow{
 				Date:   "2000-01-01",
 				Views:  22,
 				Clicks: 41,
@@ -197,42 +197,42 @@ func TestRequestValidate(t *testing.T) {
 		},
 		{
 			name:    "invalid date",
-			request: &model.Request{Date: "01-01-2000", Views: "22", Clicks: "41", Cost: "9.22"},
+			request: &models.Request{Date: "01-01-2000", Views: "22", Clicks: "41", Cost: "9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("is not a valid date")},
 		},
 		{
 			name:    "invalid views",
-			request: &model.Request{Date: "2000-01-01", Views: "two", Clicks: "41", Cost: "9.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "two", Clicks: "41", Cost: "9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("is not a valid views")},
 		},
 		{
 			name:    "invalid clicks",
-			request: &model.Request{Date: "2000-01-01", Views: "12", Clicks: "three", Cost: "9.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "12", Clicks: "three", Cost: "9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("is not a valid clicks")},
 		},
 		{
 			name:    "invalid cost (,)",
-			request: &model.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "nine.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "nine.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("is not a valid cost")},
 		},
 		{
 			name:    "invalid cost more than 2 dec plases",
-			request: &model.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "9.222"},
+			request: &models.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "9.222"},
 			want:    outputRequestValidate{nil, fmt.Errorf("cost must have two decimal places")},
 		},
 		{
 			name:    "invalid cost < 0",
-			request: &model.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "-9.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "12", Clicks: "2", Cost: "-9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("cost must be > 0")},
 		},
 		{
 			name:    "invalid clicks < 0",
-			request: &model.Request{Date: "2000-01-01", Views: "12", Clicks: "-12", Cost: "-9.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "12", Clicks: "-12", Cost: "-9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("clicks must be > 0")},
 		},
 		{
 			name:    "invalid views < 0",
-			request: &model.Request{Date: "2000-01-01", Views: "-12", Clicks: "12", Cost: "-9.22"},
+			request: &models.Request{Date: "2000-01-01", Views: "-12", Clicks: "12", Cost: "-9.22"},
 			want:    outputRequestValidate{nil, fmt.Errorf("views must be > 0")},
 		},
 	}

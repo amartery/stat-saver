@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amartery/statSaver/internal/app/model"
+	"github.com/amartery/statSaver/internal/app/models"
 )
 
 // DateValidate ...
-func DateValidate(from, to string) (*model.DateLimit, error) {
+func DateValidate(from, to string) (*models.DateLimit, error) {
 	if from == "" || to == "" {
 		return nil, fmt.Errorf("from, to are required")
 	}
@@ -31,7 +31,7 @@ func DateValidate(from, to string) (*model.DateLimit, error) {
 	} else if dateFrom.Year() == dateTo.Year() && dateFrom.YearDay() >= dateTo.YearDay() {
 		return nil, fmt.Errorf("from must be > to")
 	}
-	return &model.DateLimit{
+	return &models.DateLimit{
 		From: dateFrom.Format("2006-01-02"),
 		To:   dateTo.Format("2006-01-02"),
 	}, nil
@@ -49,8 +49,8 @@ func FieldSortValid(category string) bool {
 }
 
 // RequestValidate ...
-func RequestValidate(r *model.Request) (*model.StatisticsShow, error) {
-	res := &model.StatisticsShow{}
+func RequestValidate(r *models.Request) (*models.StatisticsShow, error) {
+	res := &models.StatisticsShow{}
 
 	date, err := time.Parse("2006-01-02", r.Date)
 	if err != nil {

@@ -1,4 +1,4 @@
-package model
+package models
 
 // Request ...
 type Request struct {

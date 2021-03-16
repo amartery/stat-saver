@@ -1,19 +1,26 @@
-package store
+package postgresDB
 
 import (
 	"fmt"
 
-	"github.com/amartery/statSaver/internal/app/model"
+	"github.com/amartery/statSaver/internal/app/models"
+	"github.com/jmoiron/sqlx"
 )
 
 // StatRepository ...
 type StatRepository struct {
-	store *Store
+	con *sqlx.DB
+}
+
+func NewStatRepository(con *sqlx.DB) *StatRepository {
+	return &StatRepository{
+		con: con,
+	}
 }
 
 // Add ...
-func (r *StatRepository) Add(s *model.StatisticsShow) (*model.StatisticsShow, error) {
-	return s, r.store.db.QueryRow("insert into Statistic "+
+func (r *StatRepository) Add(s *models.StatisticsShow) error {
+	return r.con.QueryRow("insert into Statistic "+
 		"(event_date, views, clicks, cost, cpc, cpm) "+
 		"values ($1, $2, $3, $4, $5, $6) returning stat_id",
 		s.Date,
@@ -25,21 +32,21 @@ func (r *StatRepository) Add(s *model.StatisticsShow) (*model.StatisticsShow, er
 }
 
 // Show ...
-func (r *StatRepository) Show(d *model.DateLimit) ([]model.StatisticsShow, error) {
-	var result = []model.StatisticsShow{}
+func (r *StatRepository) Show(d *models.DateLimit) ([]models.StatisticsShow, error) {
+	var result = []models.StatisticsShow{}
 
 	queryReq := fmt.Sprintf("select * from Statistic "+
 		"where event_date >= '%s' and event_date <= '%s' order by %s;",
 		d.From,
 		d.To,
 		"event_date")
-	rows, err := r.store.db.Query(queryReq)
+	rows, err := r.con.Query(queryReq)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		currentStat := model.StatisticsShow{}
+		currentStat := models.StatisticsShow{}
 		if err := rows.Scan(
 			&currentStat.StatID,
 			&currentStat.Date,
@@ -58,20 +65,20 @@ func (r *StatRepository) Show(d *model.DateLimit) ([]model.StatisticsShow, error
 }
 
 // ShowOrdered ...
-func (r *StatRepository) ShowOrdered(d *model.DateLimit, category string) ([]model.StatisticsShow, error) {
-	var result = []model.StatisticsShow{}
+func (r *StatRepository) ShowOrdered(d *models.DateLimit, category string) ([]models.StatisticsShow, error) {
+	var result = []models.StatisticsShow{}
 	queryReq := fmt.Sprintf("select * from Statistic "+
 		"where event_date >= '%s' and event_date <= '%s' order by %s;",
 		d.From,
 		d.To,
 		category)
 
-	rows, err := r.store.db.Query(queryReq)
+	rows, err := r.con.Query(queryReq)
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next() {
-		currentStat := model.StatisticsShow{}
+		currentStat := models.StatisticsShow{}
 		if err := rows.Scan(
 			&currentStat.StatID,
 			&currentStat.Date,
@@ -90,8 +97,8 @@ func (r *StatRepository) ShowOrdered(d *model.DateLimit, category string) ([]mod
 }
 
 // ClearingStatistics ...
-func (r *StatRepository) ClearingStatistics() error {
-	_, err := r.store.db.Exec("truncate Statistic restart identity;")
+func (r *StatRepository) ClearStatistics() error {
+	_, err := r.con.Exec("truncate Statistic restart identity;")
 	if err != nil {
 		return err
 	}

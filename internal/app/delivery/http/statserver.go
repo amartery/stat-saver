@@ -1,4 +1,4 @@
-package statserver
+package http
 
 import (
 	"encoding/json"
@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/amartery/statSaver/internal/app/model"
-	"github.com/amartery/statSaver/internal/app/store"
+	"github.com/amartery/statSaver/internal/app"
+	"github.com/amartery/statSaver/internal/app/models"
 	"github.com/amartery/statSaver/internal/app/validation"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -15,18 +15,19 @@ import (
 
 // StatServer ...
 type StatServer struct {
-	config *Config
-	logger *logrus.Logger
-	router *mux.Router
-	store  *store.Store
+	config      *Config
+	logger      *logrus.Logger
+	router      *mux.Router
+	statUsecase app.Usecase
 }
 
 // New ...
-func New(config *Config) *StatServer {
+func New(config *Config, statUsecase app.Usecase) *StatServer {
 	return &StatServer{
-		config: config,
-		logger: logrus.New(),
-		router: mux.NewRouter(),
+		config:      config,
+		logger:      logrus.New(),
+		router:      mux.NewRouter(),
+		statUsecase: statUsecase,
 	}
 }
 
@@ -36,10 +37,6 @@ func (s *StatServer) Start() error {
 		return err
 	}
 	s.configureRouter()
-
-	if err := s.configureStore(); err != nil {
-		return err
-	}
 
 	s.logger.Info("starting statistics server" + s.config.BindAddr)
 	return http.ListenAndServe(s.config.BindAddr, s.router)
@@ -51,15 +48,6 @@ func (s *StatServer) configureLogger() error {
 		return err
 	}
 	s.logger.SetLevel(level)
-	return nil
-}
-
-func (s *StatServer) configureStore() error {
-	st := store.New(s.config.Store)
-	if err := st.Open(); err != nil {
-		return err
-	}
-	s.store = st
 	return nil
 }
 
@@ -84,7 +72,7 @@ func (s *StatServer) handleShow() http.HandlerFunc {
 			return
 		}
 
-		var arrayStat []model.StatisticsShow
+		var arrayStat []models.StatisticsShow
 		fieldSort := r.URL.Query().Get("sort")
 
 		if fieldSort != "" {
@@ -93,21 +81,21 @@ func (s *StatServer) handleShow() http.HandlerFunc {
 				s.error(w, r, http.StatusBadRequest, fmt.Errorf(msg))
 				return
 			}
-			arrayStat, err = s.store.Stat().ShowOrdered(fromto, fieldSort)
+			arrayStat, err = s.statUsecase.ShowOrdered(fromto, fieldSort)
 			if err != nil {
 				fmt.Println(err)
 				s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
 				return
 			}
 		} else {
-			arrayStat, err = s.store.Stat().Show(fromto)
+			arrayStat, err = s.statUsecase.Show(fromto)
 			if err != nil {
 				fmt.Println(err)
 				s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
 				return
 			}
 		}
-		result := make(map[string][]model.StatisticsShow)
+		result := make(map[string][]models.StatisticsShow)
 		result["statistics"] = arrayStat
 		s.respond(w, r, http.StatusOK, result)
 	}
@@ -118,7 +106,7 @@ func (s *StatServer) handleAdd() http.HandlerFunc {
 		s.logger.Info("starting handleAdd")
 		w.Header().Set("Content-Type", "application/json")
 
-		req := &model.Request{}
+		req := &models.Request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			fmt.Println(err)
 			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
@@ -130,7 +118,7 @@ func (s *StatServer) handleAdd() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, fmt.Errorf("error request validate"))
 			return
 		}
-		_, err = s.store.Stat().Add(statForBD)
+		err = s.statUsecase.Add(statForBD)
 		if err != nil {
 			fmt.Println(err)
 			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
@@ -144,7 +132,7 @@ func (s *StatServer) handleDel() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.logger.Info("starting handleDel")
 
-		err := s.store.Stat().ClearingStatistics()
+		err := s.statUsecase.ClearStatistics()
 		if err != nil {
 			fmt.Println(err)
 			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))

@@ -1,4 +1,4 @@
-package model
+package models
 
 // DateLimit ...
 type DateLimit struct {
