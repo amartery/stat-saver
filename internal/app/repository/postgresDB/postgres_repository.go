@@ -3,6 +3,7 @@ package postgresDB
 import (
 	"fmt"
 
+	"github.com/amartery/statSaver/internal/app"
 	"github.com/amartery/statSaver/internal/app/models"
 	"github.com/jmoiron/sqlx"
 )
@@ -12,7 +13,7 @@ type StatRepository struct {
 	con *sqlx.DB
 }
 
-func NewStatRepository(con *sqlx.DB) *StatRepository {
+func NewStatRepository(con *sqlx.DB) app.Repository {
 	return &StatRepository{
 		con: con,
 	}

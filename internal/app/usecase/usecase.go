@@ -9,7 +9,7 @@ type StatUsecase struct {
 	statRep app.Repository
 }
 
-func NewStatUsecase(statRep app.Repository) *StatUsecase {
+func NewStatUsecase(statRep app.Repository) app.Usecase {
 	return &StatUsecase{
 		statRep: statRep,
 	}
