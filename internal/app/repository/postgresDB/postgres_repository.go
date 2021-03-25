@@ -42,10 +42,10 @@ func (r *StatRepository) Show(d *models.DateLimit) ([]models.StatisticsShow, err
 		d.To,
 		"event_date")
 	rows, err := r.con.Query(queryReq)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		currentStat := models.StatisticsShow{}
@@ -76,10 +76,10 @@ func (r *StatRepository) ShowOrdered(d *models.DateLimit, category string) ([]mo
 		category)
 
 	rows, err := r.con.Query(queryReq)
-	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		currentStat := models.StatisticsShow{}
 		if err := rows.Scan(
