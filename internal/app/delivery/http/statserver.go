@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/amartery/statSaver/internal/app"
+	"github.com/amartery/statSaver/internal/app/middleware"
 	"github.com/amartery/statSaver/internal/app/models"
 	"github.com/amartery/statSaver/internal/app/validation"
 	"github.com/gorilla/mux"
@@ -52,6 +53,7 @@ func (s *StatServer) configureLogger() error {
 }
 
 func (s *StatServer) configureRouter() {
+	s.router.Use(middleware.PanicMiddleware)
 	s.router.HandleFunc("/stat/show", s.handleShow()).Methods("GET")
 	s.router.HandleFunc("/stat/add", s.handleAdd()).Methods("POST")
 	s.router.HandleFunc("/stat/del", s.handleDel()).Methods("DELETE")
