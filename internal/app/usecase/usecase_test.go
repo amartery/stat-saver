@@ -1,4 +1,4 @@
-package postgresDB
+package usecase
 
 import (
 	"testing"
@@ -20,11 +20,12 @@ func TestAdd(t *testing.T) {
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mock := mocks.NewMockRepository(ctrl)
+	mock := mocks.NewMockUsecase(ctrl)
 
 	mock.EXPECT().Add(statModel).Times(1).Return(nil)
 
-	err := mock.Add(statModel)
+	u := NewStatUsecase(mock)
+	err := u.Add(statModel)
 	require.NoError(t, err)
 }
 
@@ -49,7 +50,7 @@ func TestShow(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mock := mocks.NewMockRepository(ctrl)
+	mock := mocks.NewMockUsecase(ctrl)
 
 	timeLimit := &models.DateLimit{
 		From: "2000-01-01",
@@ -58,7 +59,8 @@ func TestShow(t *testing.T) {
 
 	mock.EXPECT().Show(timeLimit).Times(1).Return(wantRes, nil)
 
-	reciveRes, err := mock.Show(timeLimit)
+	u := NewStatUsecase(mock)
+	reciveRes, err := u.Show(timeLimit)
 	require.NoError(t, err)
 	require.Equal(t, wantRes, reciveRes)
 }
@@ -84,7 +86,7 @@ func TestShowOrdered(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mock := mocks.NewMockRepository(ctrl)
+	mock := mocks.NewMockUsecase(ctrl)
 
 	timeLimit := &models.DateLimit{
 		From: "2000-01-01",
@@ -93,7 +95,8 @@ func TestShowOrdered(t *testing.T) {
 	sortCategory := "clicks"
 	mock.EXPECT().ShowOrdered(timeLimit, sortCategory).Times(1).Return(wantRes, nil)
 
-	reciveRes, err := mock.ShowOrdered(timeLimit, sortCategory)
+	u := NewStatUsecase(mock)
+	reciveRes, err := u.ShowOrdered(timeLimit, sortCategory)
 	require.NoError(t, err)
 	require.Equal(t, wantRes, reciveRes)
 }
@@ -102,10 +105,11 @@ func TestClearStatistics(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mock := mocks.NewMockRepository(ctrl)
+	mock := mocks.NewMockUsecase(ctrl)
 
 	mock.EXPECT().ClearStatistics().Times(1).Return(nil)
 
-	err := mock.ClearStatistics()
+	u := NewStatUsecase(mock)
+	err := u.ClearStatistics()
 	require.NoError(t, err)
 }
