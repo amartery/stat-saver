@@ -30,7 +30,7 @@ func (usecase *StatUsecase) Show(d *models.DateLimit) ([]models.StatisticsShow, 
 }
 
 func (usecase *StatUsecase) ShowOrdered(d *models.DateLimit, category string) ([]models.StatisticsShow, error) {
-	arrayStatOrder, err := usecase.statRep.Show(d)
+	arrayStatOrder, err := usecase.statRep.ShowOrdered(d, category)
 	if err != nil {
 		return nil, err
 	}
