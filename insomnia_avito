@@ -1,0 +1,163 @@
+_type: export
+__export_format: 4
+__export_date: 2021-03-27T09:32:09.205Z
+__export_source: insomnia.desktop.app:v2021.1.1
+resources:
+  - _id: req_232e145062554512afc50efa8e8e26bf
+    parentId: fld_0b7be1bd2680442797cb7414d138411e
+    modified: 1616715481337
+    created: 1615314842551
+    url: http://127.0.0.1:8080/stat/add
+    name: avi-add
+    description: ""
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"date":"2019-08-22",
+        	"views":"4",
+        	"clicks":"55556786839",
+        	"cost":"100000.57"
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_47687c323020456c82fac5395b24824d
+    authentication: {}
+    metaSortKey: -1615837110533
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_0b7be1bd2680442797cb7414d138411e
+    parentId: wrk_b493270858744e0f98100ea2f505d084
+    modified: 1616524690092
+    created: 1616524608120
+    name: avito-Stat
+    description: ""
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1616524608121
+    _type: request_group
+  - _id: wrk_b493270858744e0f98100ea2f505d084
+    parentId: null
+    modified: 1615134499536
+    created: 1615134499536
+    name: Insomnia
+    description: ""
+    scope: collection
+    _type: workspace
+  - _id: req_b55749d2a5c5496c91118809ea86c9bf
+    parentId: fld_0b7be1bd2680442797cb7414d138411e
+    modified: 1616524620127
+    created: 1615321652397
+    url: http://127.0.0.1:8080/stat/show?from=2000-01-01&to=2021-01-01
+    name: avi-show
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1615837110483
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_6c9e4a7d43d94c0dbe897a627096819d
+    parentId: fld_0b7be1bd2680442797cb7414d138411e
+    modified: 1616715500652
+    created: 1615323023275
+    url: http://127.0.0.1:8080/stat/show?from=2000-01-01&to=2020-01-01&sort=views
+    name: avi-show-order
+    description: ""
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1615837110433
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_8c224c9387d14cfd8844449a1d80af40
+    parentId: fld_0b7be1bd2680442797cb7414d138411e
+    modified: 1616524613266
+    created: 1615837110383
+    url: http://127.0.0.1:8080/stat/del
+    name: avi-del
+    description: ""
+    method: DELETE
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1615837110383
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_014d40bb7ec9c07a496d3418e5175ad24162b7a5
+    parentId: wrk_b493270858744e0f98100ea2f505d084
+    modified: 1615134499570
+    created: 1615134499570
+    name: Base Environment
+    data: {}
+    dataPropertyOrder: null
+    color: null
+    isPrivate: false
+    metaSortKey: 1615134499570
+    _type: environment
+  - _id: jar_014d40bb7ec9c07a496d3418e5175ad24162b7a5
+    parentId: wrk_b493270858744e0f98100ea2f505d084
+    modified: 1616836459561
+    created: 1615134499572
+    name: Default Jar
+    cookies:
+      - key: session_id
+        value: "4"
+        expires: 2021-03-08T23:39:41.000Z
+        domain: 127.0.0.1
+        path: /
+        hostOnly: true
+        creation: 2021-03-07T20:53:47.235Z
+        lastAccessed: 2021-03-07T23:39:41.360Z
+        id: "4035761656423247"
+      - key: session_id
+        value: c4ca4238a0b923820dcc509a6f75849b
+        expires: 2021-03-26T09:14:19.000Z
+        domain: 127.0.0.1
+        path: /api/v1
+        hostOnly: true
+        pathIsDefault: true
+        creation: 2021-03-13T12:00:00.428Z
+        lastAccessed: 2021-03-27T09:14:19.560Z
+        id: "032090133613253746"
+    _type: cookie_jar
+  - _id: spc_741dedf15a8341489451b9e39da31242
+    parentId: wrk_b493270858744e0f98100ea2f505d084
+    modified: 1615134499536
+    created: 1615134499536
+    fileName: Insomnia
+    contents: ""
+    contentType: yaml
+    _type: api_spec
