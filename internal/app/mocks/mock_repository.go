@@ -61,32 +61,17 @@ func (mr *MockRepositoryMockRecorder) ClearStatistics() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClearStatistics", reflect.TypeOf((*MockRepository)(nil).ClearStatistics))
 }
 
-// Show mocks base method
-func (m *MockRepository) Show(arg0 *models.DateLimit) ([]models.StatisticsShow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Show", arg0)
-	ret0, _ := ret[0].([]models.StatisticsShow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Show indicates an expected call of Show
-func (mr *MockRepositoryMockRecorder) Show(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Show", reflect.TypeOf((*MockRepository)(nil).Show), arg0)
-}
-
 // ShowOrdered mocks base method
-func (m *MockRepository) ShowOrdered(arg0 *models.DateLimit, arg1 string) ([]models.StatisticsShow, error) {
+func (m *MockRepository) ShowOrdered(arg0 *models.RequestForShow) (*[]models.StatisticsShow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ShowOrdered", arg0, arg1)
-	ret0, _ := ret[0].([]models.StatisticsShow)
+	ret := m.ctrl.Call(m, "ShowOrdered", arg0)
+	ret0, _ := ret[0].(*[]models.StatisticsShow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ShowOrdered indicates an expected call of ShowOrdered
-func (mr *MockRepositoryMockRecorder) ShowOrdered(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) ShowOrdered(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowOrdered", reflect.TypeOf((*MockRepository)(nil).ShowOrdered), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowOrdered", reflect.TypeOf((*MockRepository)(nil).ShowOrdered), arg0)
 }

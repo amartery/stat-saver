@@ -9,26 +9,25 @@ import (
 	"github.com/amartery/statSaver/internal/app"
 	"github.com/amartery/statSaver/internal/app/middleware"
 	"github.com/amartery/statSaver/internal/app/models"
-	"github.com/amartery/statSaver/internal/app/validation"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 )
 
 // StatServer ...
 type StatServer struct {
-	config      *Config
-	logger      *logrus.Logger
-	router      *mux.Router
-	statUsecase app.Usecase
+	config  *Config
+	logger  *logrus.Logger
+	router  *mux.Router
+	usecase app.Usecase
 }
 
 // New ...
 func New(config *Config, statUsecase app.Usecase) *StatServer {
 	return &StatServer{
-		config:      config,
-		logger:      logrus.New(),
-		router:      mux.NewRouter(),
-		statUsecase: statUsecase,
+		config:  config,
+		logger:  logrus.New(),
+		router:  mux.NewRouter(),
+		usecase: statUsecase,
 	}
 }
 
@@ -54,94 +53,72 @@ func (s *StatServer) configureLogger() error {
 
 func (s *StatServer) configureRouter() {
 	s.router.Use(middleware.PanicMiddleware)
-	s.router.HandleFunc("/stat/show", s.handleShow()).Methods("GET")
-	s.router.HandleFunc("/stat/add", s.handleAdd()).Methods("POST")
-	s.router.HandleFunc("/stat/del", s.handleDel()).Methods("DELETE")
+	s.router.Use(middleware.ContentTypeJson)
+	s.router.HandleFunc("/stat/show", s.handleShow).Methods("GET")
+	s.router.HandleFunc("/stat/add", s.handleAdd).Methods("POST")
+	s.router.HandleFunc("/stat/del", s.handleDel).Methods("DELETE")
 }
 
-func (s *StatServer) handleShow() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Info("starting handleShow")
-		w.Header().Set("Content-Type", "application/json")
+func (s *StatServer) handleShow(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("starting handleShow")
 
-		from := r.URL.Query().Get("from")
-		to := r.URL.Query().Get("to")
-
-		fromto, err := validation.DateValidate(from, to)
-		if err != nil {
-			fmt.Println(err)
-			s.error(w, r, http.StatusBadRequest, fmt.Errorf("error data validation"))
-			return
-		}
-
-		var arrayStat []models.StatisticsShow
-		fieldSort := r.URL.Query().Get("sort")
-
-		if fieldSort != "" {
-			if !validation.FieldSortValid(fieldSort) {
-				msg := fieldSort + "field doesn`t exist, available fields [event_date, views, clicks, cost, cpc, cpm]"
-				s.error(w, r, http.StatusBadRequest, fmt.Errorf(msg))
-				return
-			}
-			arrayStat, err = s.statUsecase.ShowOrdered(fromto, fieldSort)
-			if err != nil {
-				fmt.Println(err)
-				s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
-				return
-			}
-		} else {
-			arrayStat, err = s.statUsecase.Show(fromto)
-			if err != nil {
-				fmt.Println(err)
-				s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
-				return
-			}
-		}
-		result := make(map[string][]models.StatisticsShow)
-		result["statistics"] = arrayStat
-		s.respond(w, r, http.StatusOK, result)
+	forShow := &models.RequestForShow{
+		From:      r.URL.Query().Get("from"),
+		To:        r.URL.Query().Get("to"),
+		SortField: r.URL.Query().Get("sort"),
 	}
+
+	err := forShow.Validate()
+	if err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusBadRequest, fmt.Errorf("validation: "+err.Error()))
+		return
+	}
+
+	arrayStat, err := s.usecase.Show(forShow)
+	if err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
+		return
+	}
+	s.respond(w, r, http.StatusOK, map[string]*[]models.StatisticsShow{"statistics": arrayStat})
 }
 
-func (s *StatServer) handleAdd() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Info("starting handleAdd")
-		w.Header().Set("Content-Type", "application/json")
+func (s *StatServer) handleAdd(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("starting handleAdd")
 
-		req := &models.Request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			fmt.Println(err)
-			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
-			return
-		}
-		statForBD, err := validation.RequestValidate(req)
-		if err != nil {
-			fmt.Println(err)
-			s.error(w, r, http.StatusBadRequest, fmt.Errorf("error request validate"))
-			return
-		}
-		err = s.statUsecase.Add(statForBD)
-		if err != nil {
-			fmt.Println(err)
-			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
-			return
-		}
-		s.respond(w, r, http.StatusOK, nil)
+	req := &models.RequestForSave{}
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
+		return
 	}
+	err := req.Validate()
+	if err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusBadRequest, fmt.Errorf("validation: "+err.Error()))
+		return
+	}
+	err = s.usecase.Add(req)
+	if err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusBadRequest, fmt.Errorf("validation: "+err.Error()))
+		return
+	}
+	s.respond(w, r, http.StatusOK, nil)
 }
 
-func (s *StatServer) handleDel() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Info("starting handleDel")
+func (s *StatServer) handleDel(w http.ResponseWriter, r *http.Request) {
+	s.logger.Info("starting handleDel")
 
-		err := s.statUsecase.ClearStatistics()
-		if err != nil {
-			fmt.Println(err)
-			s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
-			return
-		}
-		s.respond(w, r, http.StatusOK, nil)
+	err := s.usecase.ClearStatistics()
+	if err != nil {
+		fmt.Println(err)
+		s.error(w, r, http.StatusInternalServerError, fmt.Errorf("error on the server"))
+		return
 	}
+	s.respond(w, r, http.StatusOK, nil)
+
 }
 
 func (s *StatServer) error(w http.ResponseWriter, r *http.Request, code int, err error) {

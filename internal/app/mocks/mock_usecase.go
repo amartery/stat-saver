@@ -34,7 +34,7 @@ func (m *MockUsecase) EXPECT() *MockUsecaseMockRecorder {
 }
 
 // Add mocks base method
-func (m *MockUsecase) Add(arg0 *models.StatisticsShow) error {
+func (m *MockUsecase) Add(arg0 *models.RequestForSave) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", arg0)
 	ret0, _ := ret[0].(error)
@@ -62,10 +62,10 @@ func (mr *MockUsecaseMockRecorder) ClearStatistics() *gomock.Call {
 }
 
 // Show mocks base method
-func (m *MockUsecase) Show(arg0 *models.DateLimit) ([]models.StatisticsShow, error) {
+func (m *MockUsecase) Show(arg0 *models.RequestForShow) (*[]models.StatisticsShow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Show", arg0)
-	ret0, _ := ret[0].([]models.StatisticsShow)
+	ret0, _ := ret[0].(*[]models.StatisticsShow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -74,19 +74,4 @@ func (m *MockUsecase) Show(arg0 *models.DateLimit) ([]models.StatisticsShow, err
 func (mr *MockUsecaseMockRecorder) Show(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Show", reflect.TypeOf((*MockUsecase)(nil).Show), arg0)
-}
-
-// ShowOrdered mocks base method
-func (m *MockUsecase) ShowOrdered(arg0 *models.DateLimit, arg1 string) ([]models.StatisticsShow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ShowOrdered", arg0, arg1)
-	ret0, _ := ret[0].([]models.StatisticsShow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ShowOrdered indicates an expected call of ShowOrdered
-func (mr *MockUsecaseMockRecorder) ShowOrdered(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ShowOrdered", reflect.TypeOf((*MockUsecase)(nil).ShowOrdered), arg0, arg1)
 }

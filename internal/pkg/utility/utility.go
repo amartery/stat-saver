@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/jmoiron/sqlx"
+	"database/sql"
+
 	_ "github.com/lib/pq" // ...
 )
 
-func CreatePostgresConnection(dbSettings string) (*sqlx.DB, error) {
+func CreatePostgresConnection(dbSettings string) (*sql.DB, error) {
 	con, err := Open(dbSettings)
 	if err != nil {
 		fmt.Println(err)
@@ -18,7 +19,7 @@ func CreatePostgresConnection(dbSettings string) (*sqlx.DB, error) {
 }
 
 // InitDatabase ...
-func InitDatabase(con *sqlx.DB) error {
+func InitDatabase(con *sql.DB) error {
 	sqlInitFile, err := ioutil.ReadFile("scripts/statistics.sql")
 	if err != nil {
 		fmt.Println(err)
@@ -33,8 +34,8 @@ func InitDatabase(con *sqlx.DB) error {
 }
 
 // Open ...
-func Open(dbSettings string) (*sqlx.DB, error) {
-	db, err := sqlx.Connect("postgres", dbSettings)
+func Open(dbSettings string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", dbSettings)
 	if err != nil {
 		fmt.Println("open db")
 		return nil, err
@@ -51,6 +52,6 @@ func Open(dbSettings string) (*sqlx.DB, error) {
 }
 
 // Close ...
-func Close(con *sqlx.DB) {
+func Close(con *sql.DB) {
 	con.Close()
 }
