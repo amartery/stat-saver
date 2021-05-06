@@ -43,4 +43,4 @@ curl --request DELETE \
 - в методе показа статистики можно выбрать сортировку по полям: 
 event_date, views, clicks, cost, cpc, cpm    
 - есть документация swagger (файл api-swagger.yaml)  
-- добвил CI (github actions)
+- настроил CI (Github Actions)
