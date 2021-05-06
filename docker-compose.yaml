@@ -1,28 +1,29 @@
 version: '3.8'
 
 volumes:
-  db:
+  db-data:
 
 services:
-  database:
-    image:
-       postgres
+  main:
+    build: .
+    command: ./scripts/wait-for-postgres.sh db ./main
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_PASSWORD: password
+
+  db:
+    restart: always
+    image: postgres:latest
     ports:
       - 5432:5432
     volumes:
-      - db:/var/lib/postgresql/data/
+      - db-data:/var/lib/postgresql/data/
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-        POSTGRES_DB: statserver_db
-        POSTGRES_USER: statserver
-        POSTGRES_PASSWORD: password
-
-  main:
-    build: .
-    command:
-        ./main
-    ports:
-      - "8080:8080"
-    links:
-        - database
-    depends_on:
-        - database
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    

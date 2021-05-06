@@ -12,6 +12,6 @@ func NewConfig() *Config {
 	return &Config{
 		BindAddr:    ":8080",
 		LogLevel:    "debug",
-		DataBaseURL: "host=database dbname=statserver_db user=statserver password=password sslmode=disable",
+		DataBaseURL: "host=db dbname=postgres user=postgres password=password sslmode=disable",
 	}
 }

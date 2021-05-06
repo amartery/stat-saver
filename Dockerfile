@@ -2,12 +2,19 @@ FROM golang:latest
 
 LABEL maintainer="amartery@gmail.com"
 
-WORKDIR $GOPATH/src/app
-COPY . $GOPATH/src/app
+ENV GOPATH=/
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+COPY ./ ./
 
+# install psql
+RUN apt-get update
+RUN apt-get -y install postgresql-client
+
+# make wait-for-postgres.sh executable
+RUN chmod +x ./scripts/wait-for-postgres.sh
+
+# build go app
+RUN go mod download
 RUN make build
 
 EXPOSE 8080
